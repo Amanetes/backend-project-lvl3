@@ -1,9 +1,12 @@
 {
   "name": "@hexlet/code",
+  "bin": {
+    "page-loader": "bin/page-loader.js"
+  },
   "version": "1.0.0",
   "type": "module",
   "description": "[![Actions Status](https://github.com/Amanetes/backend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/Amanetes/backend-project-lvl3/actions)",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "npx jest --bail",
     "coverage": "npx jest --coverage"

@@ -1,14 +1,14 @@
 install:
-	npm ci
+		npm ci
+page-loader:
+		node bin/page-loader.js
 lint:
-	npx eslint .
+		npx eslint .
 fix:
-	npx eslint --fix .
+		npx eslint --fix .
 test:
-	npx jest
+		npx jest
 test-coverage:
-	npx jest --coverage --coverageProvider=v8
+		npx jest --coverage --coverageProvider=v8
 publish:
-	npm publish --dry-run
-
-.PHONY: test
+		npm publish --dry-run
