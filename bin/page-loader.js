@@ -10,9 +10,8 @@ program
   .version('0.0.1', '-V, --version', 'output the version number')
   .argument('<url>')
   .option('-o, --output [dir]', 'output dir', process.cwd())
-  .action(async (url) => {
-    await pageLoader(url, program.opts().output);
-    await console.log('Page loaded');
+  .action(async (url, options) => {
+    await pageLoader(url, options.output);
+    await console.log('Page successfully downoladed into', options.output);
   });
-
 program.parse();

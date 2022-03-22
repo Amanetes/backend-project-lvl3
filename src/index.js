@@ -1,28 +1,23 @@
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs/promises';
+import getFileName from './utilities.js';
 
-// Формируем имя файла из переданной ссылке
+// Здесь будут функции с побочными эффектами
 
-const getFileName = (url) => {
-  // создаем экземпляр класса URL
-  // т.к у переданной ссылка - это строка, а не объект со свойствами
-  const myUrl = new URL(url);
-  const { hostname, pathname } = myUrl;
-  const fileName = `${hostname}${pathname}`;
-  return `${fileName.replace(/\W/g, '-')}.html`;
-};
 // pageLoader - принимает ссылку и путь до папки
-// для загрузки. Выполняет запрос по ссылке
-// Возвращает промис.
-export default (async (url, dirPath) => {
-  const fileName = getFileName(url);
-  const filePath = path.join(dirPath, fileName);
-  try {
-    const response = await axios.get(url);
-    await fs.writeFile(filePath, response.data);
-    console.log('Writing finished!');
-  } catch (error) {
-    throw new Error('Unable to write!');
-  }
-});
+// для загрузки. По умолчанию = путь откуда запущен процесс
+export default (url, ouputDir = process.cwd()) => {
+  // создаем объект-экземпляр класса URL
+  // чтобы извлечь данные и построить имя файла
+  const myUrl = new URL(url);
+  const fileName = getFileName(myUrl);
+  // Построить путь до папки куда будет скачиваться файл
+  const filePath = path.join(ouputDir, fileName);
+  // Axios делает запрос к серверу по переданной ссылке
+  return axios.get(url)
+  // Записать ответ(поле data из запроса) в файл
+    .then((responce) => fs.writeFile(filePath, responce.data))
+  // Вернуть путь до файла
+    .then(() => filePath);
+};
