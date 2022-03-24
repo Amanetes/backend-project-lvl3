@@ -17,7 +17,7 @@ const isLocal = (url, baseUrl) => {
 
 const regexp = /\W+/gi;
 const replaceSymbols = (str) => str.replace(regexp, '-');
-// Получаем имя файла
+// Получаем имя файла - через path.parse удобнее получать расширение
 export const getFileName = (url) => {
   console.log(path.parse(url));
   const { dir, name, ext } = path.parse(url);
@@ -36,17 +36,16 @@ export const getDirName = (url) => {
 };
 
 // Вытаскивание ссылок из ХТМЛ страницы для последующей обработки
-// С учетом диспетчеризации по тегам
-export const getLinksFromHtml = (htmlPage, baseUrl) => {
-  const $ = cheerio.load(htmlPage);
+// С учетом диспетчеризации по тегам (ДОбавить фильтрацию по локальным ссылкам)
+const getLocalLinks = (html, url) => {
+  const $ = cheerio.load(html);
   const links = [];
-  const tags = Object.keys(mapping).map((tagName) => tagName);
-  tags.forEach((tag) => {
+  Object.entries(mapping).forEach(([tag, attr]) => {
     $(tag).each((_i, el) => {
-      links.push($(el).attr(mapping[tag]));
+      links.push($(el).attr(attr));
     });
   });
-  links
+  return links
     .filter((link) => link !== undefined)
-  .filter((link) => isLocal(link, baseUrl))
+    .map((link) => console.log(link));
 };
