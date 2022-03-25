@@ -8,18 +8,27 @@ const mapping = {
   link: 'href',
   script: 'src',
 };
-// Определяем локальные ссылки
-// В объекте URL содержится атрибут ORIGIN
-const isLocal = (url, baseUrl) => {
-  const { origin } = new URL(url);
-  return origin === baseUrl;
+// Определяем локальные ссылки (или определять по Хостам?)
+// на вход приходит ссылка и базовый URL
+const isLocal = (link, baseUrl) => {
+  // Входящая ссылка распашивается в объект
+  const linkObj = new URL(link, baseUrl);
+  // Из базовой ссылки выдираем Origin
+  const { origin } = new URL(baseUrl);
+  // Возвращаем true если origin одинаковые
+  return linkObj.origin === origin;
 };
 
 const regexp = /\W+/gi;
 const replaceSymbols = (str) => str.replace(regexp, '-');
+
+export const getNameFromUrl = (url) => {
+  const myUrl = new URL(url);
+  const { hostname, pathname } = myUrl;
+  return `${hostname}${pathname}`;
+};
 // Получаем имя файла - через path.parse удобнее получать расширение
 export const getFileName = (url) => {
-  console.log(path.parse(url));
   const { dir, name, ext } = path.parse(url);
   const rawName = replaceSymbols(path.join(dir, name));
   // Если расширение отсутствует - добавлять ХТМЛ
@@ -37,12 +46,25 @@ export const getDirName = (url) => {
 
 // Вытаскивание ссылок из ХТМЛ страницы для последующей обработки
 // С учетом диспетчеризации по тегам (ДОбавить фильтрацию по локальным ссылкам)
-const getLocalLinks = (html, url) => {
+export const getLocalLinks = (html, url, outputDir) => {
   const $ = cheerio.load(html);
   const links = [];
   Object.keys(mapping).forEach((tag) => {
     $(tag).each((_i, el) => {
-      links.push($(el).attr(mapping[tag]));
+      const currentLink = $(el).attr(mapping[tag]);
+      const localLink = isLocal(currentLink, url);
+      // Проверка на undefined и локальность ссылки
+      // В случае если ссылки по тегам отсутствуют, чтобы
+      // они не попадали в итоговый документ
+      if (currentLink && localLink) {
+        const localLinkObj = new URL(currentLink, url);
+        const fileName = getFileName(getNameFromUrl(localLinkObj));
+        const filePath = path.join(outputDir, fileName);
+        links.push(localLinkObj);
+        $(el).attr(mapping[tag], filePath);
+      }
     });
   });
+  const page = $.html();
+  return { page, links };
 };

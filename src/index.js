@@ -1,23 +1,23 @@
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs/promises';
-import getFileName from './utilities.js';
+import {
+  getFileName, getDirName, getNameFromUrl, getLocalLinks,
+} from './utilities.js';
 
 // Здесь будут функции с побочными эффектами
-
-// pageLoader - принимает ссылку и путь до папки
-// для загрузки. По умолчанию = путь откуда запущен процесс
+const createDir = (dirpath) => fs.mkdir(dirpath, { recursive: true });
+// Основная функция прнимает ссылку в виде строки
+// И путь до папки куда складывать результат
 export default (url, ouputDir = process.cwd()) => {
-  // создаем объект-экземпляр класса URL
-  // чтобы извлечь данные и построить имя файла
-  const myUrl = new URL(url);
-  const fileName = getFileName(myUrl);
-  // Построить путь до папки куда будет скачиваться файл
+  const { origin } = new URL(url);
+  const fileName = getFileName(url);
   const filePath = path.join(ouputDir, fileName);
-  // Axios делает запрос к серверу по переданной ссылке
+  const assetsDirName = getDirName(url);
+  const assetsDirPath = path.join(ouputDir, assetsDirName);
   return axios.get(url)
-  // Записать ответ(поле data из запроса) в файл
-    .then((responce) => fs.writeFile(filePath, responce.data))
-  // Вернуть путь до файла
+    .then((response) => getLocalLinks(response.data, url, assetsDirName))
+    .then(({ page, links }) => fs.writeFile(filePath, page)
+      .then(() => links))
     .then(() => filePath);
 };
