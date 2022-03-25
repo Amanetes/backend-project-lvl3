@@ -40,12 +40,9 @@ export const getDirName = (url) => {
 const getLocalLinks = (html, url) => {
   const $ = cheerio.load(html);
   const links = [];
-  Object.entries(mapping).forEach(([tag, attr]) => {
+  Object.keys(mapping).forEach((tag) => {
     $(tag).each((_i, el) => {
-      links.push($(el).attr(attr));
+      links.push($(el).attr(mapping[tag]));
     });
   });
-  return links
-    .filter((link) => link !== undefined)
-    .map((link) => console.log(link));
 };
