@@ -46,25 +46,33 @@ export const getDirName = (url) => {
 
 // Вытаскивание ссылок из ХТМЛ страницы для последующей обработки
 // С учетом диспетчеризации по тегам (ДОбавить фильтрацию по локальным ссылкам)
-export const getLocalLinks = (html, url, outputDir) => {
+// { origin } = new URL (url)
+const getLocalLinks = (html, origin) => {
   const $ = cheerio.load(html);
   const links = [];
   Object.keys(mapping).forEach((tag) => {
     $(tag).each((_i, el) => {
       const currentLink = $(el).attr(mapping[tag]);
-      const localLink = isLocal(currentLink, url);
-      // Проверка на undefined и локальность ссылки
-      // В случае если ссылки по тегам отсутствуют, чтобы
-      // они не попадали в итоговый документ
-      if (currentLink && localLink) {
-        const localLinkObj = new URL(currentLink, url);
-        const fileName = getFileName(getNameFromUrl(localLinkObj));
-        const filePath = path.join(outputDir, fileName);
-        links.push(localLinkObj);
+      const localLink = isLocal(currentLink, origin);
+      if (localLink && currentLink) { links.push(currentLink); }
+    });
+  });
+  return links;
+};
+// Можно ли сюда запихнуть ссылки сразу? или редактировать путем достал - обработал?
+const editHtml = (html, origin, outputPath) => {
+  const $ = cheerio.load(html);
+  Object.keys(mapping).forEach((tag) => {
+    $(tag).each((_i, el) => {
+      const currentLink = $(el).attr(mapping[tag]);
+      const currentLinkObj = new URL(currentLink, origin);
+      // Проверка на undefined
+      // Если локальная и существует то перезаписываем ссылку
+      if (currentLink && isLocal(currentLink, origin)) {
+        const fileName = getFileName(getNameFromUrl(currentLinkObj));
+        const filePath = path.join(outputPath, fileName);
         $(el).attr(mapping[tag], filePath);
       }
     });
   });
-  const page = $.html();
-  return { page, links };
 };
