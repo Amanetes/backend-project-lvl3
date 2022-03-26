@@ -32,7 +32,7 @@ export const getFileName = (url) => {
   const { dir, name, ext } = path.parse(url);
   const rawName = replaceSymbols(path.join(dir, name));
   // Если расширение отсутствует - добавлять ХТМЛ
-  const format = ext ?? '.html';
+  const format = ext || '.html';
 
   return `${rawName}${format}`;
 };
