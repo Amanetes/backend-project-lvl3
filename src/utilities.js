@@ -47,20 +47,26 @@ export const getDirName = (url) => {
 // Вытаскивание ссылок из ХТМЛ страницы для последующей обработки
 // С учетом диспетчеризации по тегам (ДОбавить фильтрацию по локальным ссылкам)
 // { origin } = new URL (url)
-const getLocalLinks = (html, origin) => {
+export const getLocalLinks = (html, origin) => {
   const $ = cheerio.load(html);
   const links = [];
   Object.keys(mapping).forEach((tag) => {
     $(tag).each((_i, el) => {
-      const currentLink = $(el).attr(mapping[tag]);
-      const localLink = isLocal(currentLink, origin);
-      if (localLink && currentLink) { links.push(currentLink); }
+      links.push($(el).attr(mapping[tag]));
     });
   });
-  return links;
+  // Собрать массив АБСОЛЮТНЫХ ссылок, чтобы реализовать скачивание ресурсов по ним
+  return links
+    .filter((link) => link !== undefined && isLocal(link, origin))
+    .reduce((acc, link) => {
+      if (link.startsWith('/')) {
+        return [...acc, new URL(link, origin).toString()];
+      }
+      return [...acc, new URL(link).toString()];
+    }, []);
 };
 // Можно ли сюда запихнуть ссылки сразу? или редактировать путем достал - обработал?
-const editHtml = (html, origin, outputPath) => {
+export const editHtml = (html, origin, outputPath) => {
   const $ = cheerio.load(html);
   Object.keys(mapping).forEach((tag) => {
     $(tag).each((_i, el) => {
@@ -75,4 +81,5 @@ const editHtml = (html, origin, outputPath) => {
       }
     });
   });
+  return $.html();
 };
