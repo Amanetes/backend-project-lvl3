@@ -9,18 +9,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
-// Отключаем соединенине
+// Блокируем исходящее соединение для исключения реальных запросов
 nock.disableNetConnect();
 
-let expectedHtml;
-let responceHtml;
+let responce;
 let tempDir;
-// Выключение исходящего соединения
+let expectedJpg;
+let expectedHtml;
+
 // В данном хуке строятся пути до факстур, которые тестируются
 // А также читается их содержимое
 beforeAll(async () => {
-  responceHtml = await fs.readFile(getFixturePath('before.html'), 'utf-8');
-  expectedHtml = await fs.readFile(getFixturePath('after.html'), 'utf-8');
+  // Тестовый файл, для ответа от сервера
+  responce = await fs.readFile(getFixturePath('responce.html'), 'utf-8');
+  // Тестовый файл скачанной страницы
+  expectedPage = await fs.readFile(getFixturePath('expectedHtml.html'), 'utf-8');
+  // Тестовый файл скачанного ресурса
+  expectedJpg = await fs.readFile(getFixturePath('assets/nodeJs.jpg'), 'base-64');
 });
 // В данном хуке создается временная папка
 beforeEach(async () => {
@@ -33,7 +38,7 @@ describe('Page loader performance', () => {
     nock(/ru\.hexlet\.io/)
       .get(/\/courses/)
       // Ответ со статусом 200 и содержимым - страница HTML
-      .reply(200, responceHtml);
+      .reply(200, response;
     // Проверяем правильно ли строится имя файла
     const filePath = await pageLoader('https://ru.hexlet.io/courses', tempDir);
     const expectedPath = path.join(tempDir, 'ru-hexlet-io-courses.html');
