@@ -24,7 +24,7 @@ beforeAll(async () => {
     initial: await fs.readFile(getFixturePath('ru-hexlet-io-courses.html'), 'utf-8'),
     js: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-packs-js-runtime.js'), 'utf-8'),
     css: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-application.css'), 'utf-8'),
-    png: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png')),
+    png: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png'), 'base64'),
     html: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-courses.html'), 'utf-8'),
   };
 });
@@ -58,12 +58,12 @@ describe('Successful scenario', () => {
 
     const filePath = await pageLoader('https://ru.hexlet.io/courses', tempDir);
     const expectedPath = path.join(tempDir, 'ru-hexlet-io-courses.html');
-    expect(filePath).toBe(expectedPath);
+    expect(filePath).toEqual(expectedPath);
 
     const downloadedHtml = await fs.readFile(filePath, 'utf-8');
     expect(downloadedHtml).toEqual(fixturesContent.initial);
 
-    const downloadedPng = await fs.readFile(assetPaths.png);
+    const downloadedPng = await fs.readFile(assetPaths.png, 'base64');
     expect(downloadedPng).toEqual(assetPaths.png);
 
     const downloadedJs = await fs.readFile(assetPaths.css, 'utf-8');
@@ -73,3 +73,31 @@ describe('Successful scenario', () => {
     expect(downloadedCss).toEqual(fixturesContent.css);
   });
 });
+
+// describe('Negative scenario', () => {
+//   test('Should throw network errors', async () => {
+//     nock(/ru\.example\.com/)
+//       .persist()
+//       .get(/\/BAD_REQUEST/)
+//       .reply(400)
+//       .get(/\/BAD_GATEWAY/)
+//       .reply(502);
+
+//     expect.assertions(2);
+//     await expect(pageLoader('http://www.example.com/bad-request', tempDir)).rejects.toThrow('The server cannot process the request');
+//     await expect(pageLoader('http://www.example.com/bad-gateway', tempDir)).rejects.toThrow('The server gon an invalid response');
+//   });
+
+//   test('Should throw filesystem errors', async () => {
+//     nock(/ru\.example\.com/)
+//       .persist()
+//       .get(/restricted/)
+//       .reply(200)
+//       .get(/absent/)
+//       .reply(200);
+
+//     expect.assertions(2);
+//     await expect(pageLoader('http://www.example.com', '/restrictedDir')).rejects.toThrow('EACCES: permission denied');
+//     await expect(pageLoader('http://www.example.com', '/absentDir')).rejects.toThrow('ENOENT: no such file or directory');
+//   });
+// });
