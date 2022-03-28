@@ -10,5 +10,11 @@ test:
 		npx jest
 test-coverage:
 		npx jest --coverage --coverageProvider=v8
+test-debug:
+		DEBUG=page-loader.* make test
+test-debug-axios:
+		DEBUG=axios make test
+test-debug-nock:
+		DEBUG=nock.* make test
 publish:
 		npm publish --dry-run
