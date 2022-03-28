@@ -73,31 +73,3 @@ describe('Successful scenario', () => {
     expect(downloadedCss).toEqual(fixturesContent.css);
   });
 });
-
-// describe('Negative scenario', () => {
-//   test('Should throw network errors', async () => {
-//     nock(/ru\.example\.com/)
-//       .persist()
-//       .get(/\/BAD_REQUEST/)
-//       .reply(400)
-//       .get(/\/BAD_GATEWAY/)
-//       .reply(502);
-
-//     expect.assertions(2);
-//     await expect(pageLoader('http://www.example.com/bad-request', tempDir)).rejects.toThrow('The server cannot process the request');
-//     await expect(pageLoader('http://www.example.com/bad-gateway', tempDir)).rejects.toThrow('The server gon an invalid response');
-//   });
-
-//   test('Should throw filesystem errors', async () => {
-//     nock(/ru\.example\.com/)
-//       .persist()
-//       .get(/restricted/)
-//       .reply(200)
-//       .get(/absent/)
-//       .reply(200);
-
-//     expect.assertions(2);
-//     await expect(pageLoader('http://www.example.com', '/restrictedDir')).rejects.toThrow('EACCES: permission denied');
-//     await expect(pageLoader('http://www.example.com', '/absentDir')).rejects.toThrow('ENOENT: no such file or directory');
-//   });
-// });
