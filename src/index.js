@@ -16,8 +16,8 @@ export default (url, outputDir = process.cwd()) => {
   const { origin } = new URL(url);
   const fileName = getFileName(getNameFromUrl(url));
   const filePath = path.join(outputDir, fileName);
-  const assetsDirName = getDirName(getNameFromUrl(url));
-  const assetsDirPath = path.join(outputDir, assetsDirName);
+  const assetsDir = getDirName(getNameFromUrl(url));
+  const assetsDirPath = path.join(outputDir, assetsDir);
   let response;
   logger(`Requesting ${url}`);
   return axios.get(url)
@@ -39,7 +39,7 @@ export default (url, outputDir = process.cwd()) => {
         }));
     })
     .then(() => {
-      const content = editHtml(response, origin, assetsDirPath);
+      const content = editHtml(response, origin, assetsDir);
       return fs.writeFile(filePath, content);
     })
     .then(() => filePath);

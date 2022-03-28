@@ -1,4 +1,5 @@
 import path from 'path';
+import prettier from 'prettier';
 import * as cheerio from 'cheerio';
 import { getNameFromUrl, getFileName } from './nameHandlers.js';
 
@@ -34,7 +35,7 @@ export const getLocalLinks = (html, origin) => {
     }, []);
 };
 
-export const editHtml = (html, origin, outputPath) => {
+export const editHtml = (html, origin, outputDir) => {
   const $ = cheerio.load(html);
   Object.keys(mapping).forEach((tag) => {
     $(tag).each((_i, el) => {
@@ -43,10 +44,10 @@ export const editHtml = (html, origin, outputPath) => {
 
       if (currentLink && isLocal(currentLink, origin)) {
         const fileName = getFileName(getNameFromUrl(currentLinkObj));
-        const filePath = path.join(outputPath, fileName);
+        const filePath = path.join(outputDir, fileName);
         $(el).attr(mapping[tag], filePath);
       }
     });
   });
-  return $.html();
+  return prettier.format($.html(), { parser: 'html' });
 };

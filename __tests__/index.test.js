@@ -23,8 +23,8 @@ beforeAll(async () => {
   fixturesContent = {
     initial: await fs.readFile(getFixturePath('ru-hexlet-io-courses.html'), 'utf-8'),
     js: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-packs-js-runtime.js'), 'utf-8'),
-    css: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-application.css'), 'binary'),
-    png: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png'), 'binary'),
+    css: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-application.css'), 'utf-8'),
+    png: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png')),
     html: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-courses.html'), 'utf-8'),
   };
 });
@@ -48,13 +48,13 @@ describe('Successful scenario', () => {
     nock(/ru\.hexlet\.io/)
       .persist()
       .get(/\/courses/)
-      .replyWithFile(200, response);
-    // .get(/assets\/professions\/nodejs\.png/)
-    // .reply(200, fixturesContent.png)
-    // .get(/assets\/application\.css/)
-    // .reply(200, fixturesContent.css)
-    // .get(/packs\/js\/runtime\.js/)
-    // .reply(200, fixturesContent.js);
+      .replyWithFile(200, response)
+      .get(/assets\/professions\/nodejs\.png/)
+      .reply(200, fixturesContent.png)
+      .get(/assets\/application\.css/)
+      .reply(200, fixturesContent.css)
+      .get(/packs\/js\/runtime\.js/)
+      .reply(200, fixturesContent.js);
 
     const filePath = await pageLoader('https://ru.hexlet.io/courses', tempDir);
     const expectedPath = path.join(tempDir, 'ru-hexlet-io-courses.html');
@@ -63,44 +63,13 @@ describe('Successful scenario', () => {
     const downloadedHtml = await fs.readFile(filePath, 'utf-8');
     expect(downloadedHtml).toEqual(fixturesContent.initial);
 
-    // const downloadedPng = fs.readFile(assetPaths.png, 'binary');
-    // expect(downloadedPng).toEqual(assetPaths.png);
+    const downloadedPng = await fs.readFile(assetPaths.png);
+    expect(downloadedPng).toEqual(assetPaths.png);
 
-    // const downloadedJs = fs.readFile(assetPaths.css, 'utf-8');
-    // expect(downloadedJs).toEqual(fixturesContent.js);
+    const downloadedJs = await fs.readFile(assetPaths.css, 'utf-8');
+    expect(downloadedJs).toEqual(fixturesContent.js);
 
-    // const downloadedCss = fs.readFile(assetPaths.css, 'binary');
-    // expect(downloadedCss).toEqual(fixturesContent.css);
-
-    // const downloadedHtml = fs.readFile(assetPaths.html, 'utf-8');
-    // expect(downloadedHtml).toEqual(fixturesContent.html);
+    const downloadedCss = await fs.readFile(assetPaths.css, 'utf-8');
+    expect(downloadedCss).toEqual(fixturesContent.css);
   });
 });
-
-// describe('Negative scenario', () => {
-//   test('Should throw network errors', async () => {
-//     nock(/ru\.example\.com/)
-//       .persist()
-//       .get(/\/BAD_REQUEST/)
-//       .reply(400)
-//       .get(/\/BAD_GATEWAY/)
-//       .reply(502);
-
-//     expect.assertions(2);
-//     await expect(pageLoader('http://www.example.com/bad-request', tempDir)).rejects.toThrow('The server cannot process the request');
-//     await expect(pageLoader('http://www.example.com/bad-gateway', tempDir)).rejects.toThrow('The server gon an invalid response');
-//   });
-
-//   test('Should throw filesystem errors', async () => {
-//     nock(/ru\.example\.com/)
-//       .persist()
-//       .get(/restricted/)
-//       .reply(200)
-//       .get(/absent/)
-//       .reply(200);
-
-//     expect.assertions(2);
-//     await expect(pageLoader('http://www.example.com', '/restrictedDir')).rejects.toThrow('EACCES: permission denied');
-//     await expect(pageLoader('http://www.example.com', '/absentDir')).rejects.toThrow('ENOENT: no such file or directory');
-//   });
-// });
