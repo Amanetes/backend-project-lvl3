@@ -10,8 +10,12 @@ program
   .version('0.0.1', '-V, --version', 'output the version number')
   .argument('<url>')
   .option('-o, --output [dir]', 'output dir', process.cwd())
-  .action(async (url, options) => {
-    await pageLoader(url, options.output);
-    await console.log('Page successfully downoladed into', options.output);
+  .action((url, options) => {
+    pageLoader(url, options.output)
+      .then(() => console.log(`Page was successfully downloaded into ${options.output}`))
+      .catch((err) => {
+        console.error(err.message);
+        process.exitCode = 1;
+      });
   });
 program.parse();
