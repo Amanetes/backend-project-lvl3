@@ -24,7 +24,7 @@ beforeAll(async () => {
     initial: await fs.readFile(getFixturePath('ru-hexlet-io-courses.html'), 'utf-8'),
     js: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-packs-js-runtime.js'), 'utf-8'),
     css: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-application.css'), 'utf-8'),
-    png: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png'), 'base64'),
+    png: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png')),
     html: await fs.readFile(getFixturePath('ru-hexlet-io-courses_files/ru-hexlet-io-courses.html'), 'utf-8'),
   };
 });
@@ -39,12 +39,13 @@ beforeEach(async () => {
   };
 });
 
-// afterEach(async () => {
-//   await fs.rm(tempDir, { recursive: true });
-// });
+afterEach(async () => {
+  await fs.rm(tempDir, { recursive: true });
+  nock.cleanAll();
+});
 
 describe('Successful scenario', () => {
-  test('Should download files', async () => {
+  it('Should download files', async () => {
     nock(/ru\.hexlet\.io/)
       .persist()
       .get(/\/courses/)
@@ -63,13 +64,36 @@ describe('Successful scenario', () => {
     const downloadedHtml = await fs.readFile(filePath, 'utf-8');
     expect(downloadedHtml).toEqual(fixturesContent.initial);
 
-    const downloadedPng = await fs.readFile(assetPaths.png, 'base64');
-    expect(downloadedPng).toEqual(assetPaths.png);
-
-    const downloadedJs = await fs.readFile(assetPaths.css, 'utf-8');
-    expect(downloadedJs).toEqual(fixturesContent.js);
+    const downloadedPng = await fs.readFile(assetPaths.png);
+    expect(downloadedPng).toEqual(fixturesContent.png);
 
     const downloadedCss = await fs.readFile(assetPaths.css, 'utf-8');
     expect(downloadedCss).toEqual(fixturesContent.css);
+
+    const downloadedJs = await fs.readFile(assetPaths.js, 'utf-8');
+    expect(downloadedJs).toEqual(fixturesContent.js);
   });
+});
+
+describe('Negative scenario', () => {
+  it('Should throw 404 Error', async () => {
+    nock(/example\.com/)
+      .get(/not-found/)
+      .reply(404);
+
+    expect.assertions(1);
+    await expect(pageLoader('https://example.com/not-found', tempDir)).rejects.toThrow('Request failed with status code 404');
+  });
+});
+
+it('Should throw filesystem errors', async () => {
+  nock(/ru\.example\.com/)
+    .get(/restricted/)
+    .reply(200)
+    .get(/absent/)
+    .reply(200);
+
+  expect.assertions(2);
+  await expect(pageLoader('http://www.example.com', '/restrictedDir')).rejects.toThrow('EACCES: permission denied');
+  await expect(pageLoader('http://www.example.com', '/absentDir')).rejects.toThrow('ENOENT: no such file or directory');
 });

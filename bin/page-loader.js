@@ -2,7 +2,6 @@
 import { Command } from 'commander/esm.mjs';
 import pageLoader from '../src/index.js';
 
-// Утилита должна выводить путь к файлу в консоль
 const program = new Command();
 
 program
@@ -15,7 +14,7 @@ program
       .then(() => console.log(`Page was successfully downloaded into ${options.output}`))
       .catch((err) => {
         console.error(err.message);
-        process.exitCode = 1;
+        process.exit(1);
       });
   });
 program.parse();
