@@ -46,7 +46,8 @@ export default (url, outputDir = process.cwd()) => {
           }),
       }));
       return new Listr(tasks, { concurrent: true, exitOnError: false })
-        .run();
+        .run()
+        .catch((error) => console.error(error.message));
     })
     .then(() => {
       logger('Processing HTML data');
@@ -58,7 +59,12 @@ export default (url, outputDir = process.cwd()) => {
       logger(`HTML has been saved to ${filePath}`);
       return filePath;
     })
-    .catch(() => {
-      throw new Error('Request failed with status code 404');
+    .catch((error) => {
+      if (error.response) {
+        logger('HTTP Error!');
+        throw new Error(`Request failed with status code ${error.response.status}`);
+      }
+      logger('FS Error!');
+      throw error;
     });
 };

@@ -76,24 +76,25 @@ describe('Successful scenario', () => {
 });
 
 describe('Negative scenario', () => {
-  it('Should throw 404 Error', async () => {
+  it('Should throw HTTP error', async () => {
     nock(/example\.com/)
-      .get(/not-found/)
-      .reply(404);
+      .get(/\/not-found/)
+      .reply(404, null);
 
     expect.assertions(1);
-    await expect(pageLoader('https://example.com/not-found', tempDir)).rejects.toThrow('Request failed with status code 404');
+
+    await expect(pageLoader('https://example.com/not-found', tempDir)).rejects.toThrowError();
   });
-});
 
-it('Should throw filesystem errors', async () => {
-  nock(/ru\.example\.com/)
-    .get(/restricted/)
-    .reply(200)
-    .get(/absent/)
-    .reply(200);
+  it('Should throw filesystem errors', async () => {
+    nock(/ru\.example\.com/)
+      .get(/restricted/)
+      .reply(200, null)
+      .get(/absent/)
+      .reply(200, null);
 
-  expect.assertions(2);
-  await expect(pageLoader('http://www.example.com', '/restrictedDir')).rejects.toThrow('EACCES: permission denied');
-  await expect(pageLoader('http://www.example.com', '/absentDir')).rejects.toThrow('ENOENT: no such file or directory');
+    expect.assertions(2);
+    await expect(pageLoader('http://example.com', '/restrictedDir')).rejects.toThrowError();
+    await expect(pageLoader('http://example.com', '/absentDir')).rejects.toThrowError();
+  });
 });

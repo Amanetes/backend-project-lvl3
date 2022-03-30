@@ -12,8 +12,8 @@ program
   .action((url, options) => {
     pageLoader(url, options.output)
       .then(() => console.log(`Page was successfully downloaded into ${options.output}`))
-      .catch((err) => {
-        console.error(err.message);
+      .catch((error) => {
+        console.error(error.message);
         process.exit(1);
       });
   });
