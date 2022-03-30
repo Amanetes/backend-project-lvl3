@@ -29,9 +29,14 @@ ____
 | Option |Description|
 | :--- |:----:|
 | -V, --version | output the version number|
-| -f, --format [type] |output dir (default: 'current working directory')|
+| -o, --output [dir] |output dir (default: 'current working directory')|
 | -h, --help |display help for command|
 
 
 
-## Download HTML page from URL
+## Download HTML page and page resources with process visualisation
+[![asciicast](https://asciinema.org/a/Eog02BNGx5by6lTFhwD8OagJO.svg)](https://asciinema.org/a/Eog02BNGx5by6lTFhwD8OagJO)
+## Page-loader with debug
+[![asciicast](https://asciinema.org/a/yY70Gd0hi7bDQ3O4b6E4VXIVq.svg)](https://asciinema.org/a/yY70Gd0hi7bDQ3O4b6E4VXIVq)
+## Error handling
+[![asciicast](https://asciinema.org/a/K04oNSCZ8WVBDAaA07JG3boQy.svg)](https://asciinema.org/a/K04oNSCZ8WVBDAaA07JG3boQy)
